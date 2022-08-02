@@ -1,0 +1,165 @@
+// 1) nested if, nested case
+local A in  
+    A = false()
+    local B in  
+        local D1 in
+            D1 = true()
+            if D1 then
+                skip Browse A
+            else
+                if B then
+                    skip Basic
+                else
+                    skip Basic
+                end
+            end
+        end
+    case A of
+        tree() then
+            skip Basic
+        else
+            case A of
+                false() then
+                    skip Basic
+            else
+                case A of
+                    true() then
+                        skip Basic
+                else
+                    skip Basic
+                end
+            end
+        end
+    end
+end
+
+// 2) more expressions; 
+// note that applications of primitive binary operators
+// ==, <, >, +, -, *, mod must be enclosed in parentheses for hoz
+local A in
+    A = 2
+    local Check in
+        local Aye in  
+            local One in
+                One = 1
+                Aye = A 
+                {Eq One Aye Check}
+            end
+        end
+    if Check then
+        skip Basic
+    else
+        skip Basic
+        end
+    end
+    local Check2 in
+        local Aye2 in
+            local Three in
+                local One in
+                    local Sub in
+                        Aye2 = A 
+                        Three = 3
+                        One = 1
+                        {IntMinus Three One Sub}
+                        {Eq Aye2 Sub Check2}
+                    end
+                end
+            end
+        end
+    if Check2 then
+        skip Browse A 
+    else
+        skip Basic
+        end
+    end
+end
+
+// 3) "in" declaration 
+local D1 in 
+    local Three in
+        Three = 3
+        D1 = tree(1:Three 2:D1)
+    end
+    local X in
+        local Y in
+            local A in
+                local B in
+                    local Tree in
+                        Tree = tree(1:A 2:B)
+                        Tree = D1
+                    end
+                end
+            end
+        end
+    end
+local Check in
+    local One in
+        local Onee in
+            One = 1
+            Onee = 1
+            {Eq One Onee Check}
+        end
+    end
+    if Check then
+        local B in
+            local Five in
+                local Two in
+                    Five = 5
+                    Two = 2
+                    {IntMinus Five Two B}
+                end
+            end
+            local Z in
+                skip Browse B
+            end
+        end
+    else
+        skip Basic
+        end
+    end
+end
+
+// 4) expressions in place of statements
+local Fun R in
+    Fun = proc {$ X Out}
+        Out = X
+        end
+    local Four in   
+        Four = 4
+        {Fun Four R}
+    skip Browse R
+    end 
+end 
+
+// 5) Bind fun
+local A in
+    local B in  
+        skip Basic 
+        local List in
+            local Four in
+                Four = 4
+                local Pair in
+                    Pair = '#'(1:B 2:B)
+                    List = rdc(1:Four 2:B 3:Pair)
+                end
+            end
+        A = List
+        end
+        local Five in
+            Five = 5
+            local Sub in
+                local Three in
+                    local Four in
+                        Three = 3
+                        Four = 4
+                        {IntMinus Three Four Sub}
+                    end
+                end
+            {IntPlus Five Sub B}
+            end
+        end
+        skip Browse A 
+        skip Browse B
+        skip Store
+    end
+end

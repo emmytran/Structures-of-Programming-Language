@@ -1,0 +1,40 @@
+// 2) more expressions; 
+// note that applications of primitive binary operators
+// ==, <, >, +, -, *, mod must be enclosed in parentheses for hoz
+local A in
+    A = 2
+    local Check in
+        local Aye in  
+            local One in
+                One = 1
+                Aye = A 
+                {Eq One Aye Check}
+            end
+        end
+    if Check then
+        skip Basic
+    else
+        skip Basic
+        end
+    end
+    local Check2 in
+        local Aye2 in
+            local Three in
+                local One in
+                    local Sub in
+                        Aye2 = A 
+                        Three = 3
+                        One = 1
+                        {IntMinus Three One Sub}
+                        {Eq Aye2 Sub Check2}
+                    end
+                end
+            end
+        end
+    if Check2 then
+        skip Browse A 
+    else
+        skip Basic
+        end
+    end
+end

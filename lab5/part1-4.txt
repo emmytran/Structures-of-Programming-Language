@@ -1,0 +1,11 @@
+// 4) expressions in place of statements
+local Fun R in
+    Fun = proc {$ X Out}
+        Out = X
+        end
+    local Four in   
+        Four = 4
+        {Fun Four R}
+    skip Browse R
+    end 
+end 

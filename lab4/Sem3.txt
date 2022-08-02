@@ -1,0 +1,105 @@
+// Run this program through the Oz interpreter by calling
+//    runFull "declarative" "Sem3.txt" "Sem3.out"
+// Explain the resulting store
+
+local P1 P2 K1 K2 A1 A2 A3 A4 DB1 DB2 F1 F2 F3 F4 in
+	P1 = person(kid:K1 age:A1 dob:DB1 food:F3)
+	P2 = person(kid:K2 age:A2 dob:DB2 food:F4)
+	K1 = kid(age:A3 food:F1)
+	K2 = kid(age:A4 food:F2)
+	A3 = 12
+	F2 = spaghetti()
+	A1 = 54
+	DB2 = 1978
+	P1 = P2
+    skip Full
+end
+
+
+/*
+--------- Sem3.out --------- 
+// [local ["P1","P2","K1","K2","A1","A2","A3","A4","DB1","DB2","F1","F2","F3","F4"] 
+[local ["EXU1","EXU2","EXU3","EXU4"] [EXU1 = K1,EXU2 = A1,EXU3 = DB1,
+EXU4 = F3,P1 = person(kid:EXU1 age:EXU2 dob:EXU3 food:EXU4)],
+local ["EXU1","EXU2","EXU3","EXU4"] [EXU1 = K2,EXU2 = A2,EXU3 = DB2,
+EXU4 = F4,P2 = person(kid:EXU1 age:EXU2 dob:EXU3 food:EXU4)],
+local ["EXU1","EXU2"] [EXU1 = A3,EXU2 = F1,K1 = kid(age:EXU1 food:EXU2)],
+local ["EXU1","EXU2"] [EXU1 = A4,EXU2 = F2,K2 = kid(age:EXU1 food:EXU2)],
+A3 = 12,F2 = spaghetti(),A1 = 54,DB2 = 1978,P1 = P2,skip/f]]
+
+--------- Sem3.txt ----------
+*Hoz> runFull "declarative" "Sem3.txt" "Sem3.out"
+Store : ((31, 18, 33, 19), spaghetti()), 
+((30, 14, 32, 15), 12), 
+((22, 10, 26, 11), kid(age:30 food:31)), 
+((25, 20, 29, 21), Unbound), 
+((24, 16, 28, 17), 1978), 
+((23, 12, 27, 13), 54), 
+((8, 9), person(age:23 dob:24 food:25 kid:22)), 
+((1), Primitive Operation), 
+((2), Primitive Operation), 
+((3), Primitive Operation), 
+((4), Primitive Operation), 
+((5), Primitive Operation), 
+((6), Primitive Operation), 
+((7), Primitive Operation)
+
+Mutable Store: Empty
+Current Environment : ("P1" -> 8, "P2" -> 9, "K1" -> 10, "K2" -> 11, 
+"A1" -> 12, "A2" -> 13, "A3" -> 14, "A4" -> 15, "DB1" -> 16, "DB2" -> 17, 
+"F1" -> 18, "F2" -> 19, "F3" -> 20, "F4" -> 21, "IntPlus" -> 1, "IntMinus" -> 2, 
+"Eq" -> 3, "GT" -> 4, "LT" -> 5, "Mod" -> 6, "IntMultiply" -> 7)
+Stack : ""
+
+--------- Takeaways ---------
+- Line 5
+- The oz program the variables:
+P1 P2 K1 K2 A1 A2 A3 A4 DB1 DB2 F1 F2 F3 F4
+- These variables started as unbound but they have been given the store location 
+from 8 to 21 in the environment
+
+- Line 6
+- The program then creates a record named person and it binds to the store location
+of the variable P1, which is 8. Within this record age is age, dob, food, and kid
+are assigned the store location 12, 16, 20, and 10 respectively
+
+- Line 7
+- Next, the program creates a record named person and binds it to the store location
+of the variable K1, which is 10. Within this record, age is age and good are assigned
+at the store location 13, 17, 21, and 11
+
+- Line 8
+- The program creates a record name kid and binds it to the store location of the variable
+K1, which is 10. Within this record, age is age and food are assigned to the store locations
+14 and 18
+
+- Line 9
+- The program creates a record named kid and binds it to the store location of the variable 
+K2, which is 11. Within this record, age is age and food are assigned to the store locations
+15 and 19
+
+- Line 10
+- Store the location of variable A3 (14) has the value of 12 assigned to it
+
+- Line 11
+- Store the location of variable F2 (19) has the record named spaghetti
+(spaghetti is an empty record at this point)
+
+- Line 12
+- Store the location of the variable A1 (12) has the value of 54 assigned to it
+
+- Line 13
+- Store the location of the variable DB2 (17) has the value of 1978 assigned to it
+
+- Line 14
+- Store the location within the variables P1 and P2 are attempted to be unified through 
+a variable to variable binding. At this point, all of the store locations have been 
+unbound when values were assigned
+
+- P1 = P2
+- person(kid:K1 age: A1 dob:DB1 food:F3) = person(kid:K2 age: A2 dob:DB2 food:F4)
+- Now each K1 and K2 are bound together in the same store location
+- They also bind the variables within its list to each other because they
+match as well (A3 and A4, F1 and F2)
+- The same thing happens with A1 and A2, DB1 and DB2 as well as F1 and F4
+*/

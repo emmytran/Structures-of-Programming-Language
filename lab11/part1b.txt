@@ -1,0 +1,144 @@
+local SumListS SumList Out1 Out2 in
+    fun {SumList L}       // Declarative recursive
+        case L
+            of nil then 0
+            [] '|'(1:H 2:T) then (H + {SumList T})
+        end
+   end
+
+    fun {SumListS L}      // Stateful iterative
+        local SumHelp C Out in
+            newCell 0 C
+            fun {SumHelp L C}
+                case L
+                    of nil then @C
+                    [] '|'(1:H 2:T) then C := (@C+H) {SumHelp T C}
+                end
+            end
+            Out = {SumHelp L C}
+            Out
+        end
+    end
+
+   Out1 = {SumList [1 2 3 4]}
+   Out2 = {SumListS [1 2 3 4]}
+   skip Browse Out1
+   skip Browse Out2
+end
+
+local FoldLS FoldL Out1 Out2 in
+   fun {FoldL F Z L}            // Declarative recursive
+      case L
+         of nil then Z
+         [] '|'(1:H 2:T) then {FoldL F {F Z H} T}
+      end
+   end
+
+   fun {FoldLS F Z L}           // Stateful iterative
+        local FoldHelp C Out in
+            newCell Z C
+            fun{FoldHelp F L}
+                case L
+                    of nil then @C
+                    [] '|'(1:H 2:T) then C := {F @C H} {FoldHelp F T}
+                end
+            end
+            Out = {FoldHelp F L}
+            Out
+        end
+    end 
+
+   Out1 = {FoldL fun {$ X Y} (X+Y) end 3 [1 2 3 4]}
+   Out2 = {FoldLS fun {$ X Y} (X+Y) end 3 [1 2 3 4]}
+   skip Browse Out1
+   skip Browse Out2
+end
+
+
+//Part 2
+local Generate G in
+    newCell 0 G
+    fun {Generate}      //Generate function
+    GenF in             //Helper
+    fun {GenF}          
+        X = @G in       //Assign X = current value of cell
+        G := (@G + 1)   //update cell 
+        X               //output 
+    end
+    GenF
+end
+
+//Testing
+local GenF X Y Z in
+    GenF = {Generate}
+    X = {GenF}
+    Y = {GenF}
+    Z = {GenF}
+    skip Browse X
+    skip Browse Y
+    skip Browse Z
+
+    end
+end
+
+//Part 3
+local NewQueue S B1 A1 A2 B2  V1 V2 V3 Out Pu Po IsE Av in
+    fun {NewQueue S}
+        local Front Back Size Pu Po IsE Av in
+            newCell 0 Size
+            newCell nil Front
+            newCell nil Back
+            Pu = proc {$ N}
+                if (@Size == 0) then
+                    Front := (N|@Front)
+                    Back := (N|@Back)
+                    Size := (@Size + 1)
+                else
+                    if {LT @Size S} then Back := (N|@Back) Size := (@Size + 1)
+                    else
+                        (H|T) = @Front (H1|T1) = @Back in Front := (H1|T) Back := (N|T1)
+                    end
+                end
+            end
+            Po = fun {$}
+                if {GT @Size 1} then
+                    (H|T) = @Front
+                    (H1|T1) = @Back in
+                    Front := (H1|T)
+                    Back := T1
+                    Size := (@Size - 1)
+                    H
+                else
+                    if (@Size == 1) then
+                        (H|T) = @Front in
+                        Size := (@Size -1)
+                        Front := nil
+                        Back := nil
+                        H
+                    end
+                end
+            end
+            IsE = fun {$}
+                (@Size == 0)
+            end
+            Av = fun {$}
+                (S-@Size)
+            end
+            ops(push:Pu pop:Po isEmpty:IsE avail:Av)
+        end
+    end
+    S = {NewQueue 2}
+    ops(push:Pu pop:Po isEmpty:IsE avail:Av) = S
+    B1 = {IsE}
+    A1 = {Av}
+    {Pu 1}
+    {Pu 2}
+    A2 = {Av}
+    {Pu 3}
+    B2 = {IsE}
+    V1 = {Po}
+    V2 = {Po}
+    V3 = {Po}
+    Out = [V1 V2 V3 B1 B2 A1 A2]
+    skip Browse Out   // Out : [ 2  3  Unbound  true()  false()  2  0 ]
+end

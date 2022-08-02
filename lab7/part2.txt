@@ -1,0 +1,76 @@
+local GateMaker AndG OrG NotG A B S IntToNeed Out MulPlex in
+    GateMaker = fun {$ F}
+        fun {$ Xs Ys} T
+            GateLoop = fun {$ Xs Ys}
+                case Xs of nil then nil
+                    [] '|'(1:X 2:Xr) then
+                        case Ys of nil then nil
+                            [] '|'(1:Y 2:Yr) then
+                                ({F X Y}|{GateLoop Xr Yr})
+                            end
+                        end
+                    end
+                    in
+                    T = thread X = {GateLoop Xs Ys} in X end 
+                    T
+                end
+            end
+            NotG = fun {$ Xs} T
+            Loop = fun {$ Xs}
+                case Xs of nil then nil
+                [] '|'(1:X 2:Xr) then ((1+(X*-1))|{Loop Xr})
+            end
+        end
+        in T = thread X = {Loop Xs} in X end T
+    end
+    AndG = {GateMaker fun {$ Xs Ys} O in
+        if (Xs==0) then O = 0 //short circuit
+        else O = (Xs*Ys) //use expression
+    end
+    O //output
+end}
+    OrG = {GateMaker fun {$ Xs Ys} O in
+    if (Xs==1) then O = 1 //short circuit
+    else O = (Xs+Ys) //rest are true
+    end
+    O //output
+end}
+
+//2a
+IntToNeed = fun {$ Xs} Loop O in
+    Loop = fun {$ Xs}
+    case Xs of nil then //empty list case
+        nil
+    [] '|'(1:X 2:Xr) then O in //list is populated
+        byNeed fun {$} X end O //turn head into byneed
+        (O|{Loop Xr}) //pass byneed var as head and repeat with tail
+    end
+end
+ O = {Loop Xs}
+ O
+end
+
+//2c
+fun {MulPlex A B S} And1 And2 Not Or in
+    And1 = {AndG S B} //first And gate
+    Not = {NotG S} //reverse bits of S
+    And2 = {AndG Not A} //second And gate
+    Or = {OrG And1 And2} //run both lists from And gates through Or gate
+    Or //output
+end
+
+A = {IntToNeed [0 1 1 0 0 1]}
+B = {IntToNeed [1 1 1 0 1 0]}
+S = [1 0 1 0 1 1]
+Out = {MulPlex A B S}
+
+// run a loop so the MulPlex threads can finish before displaying Out
+local Loop in
+    proc {Loop X}
+    if (X == 0) then skip Basic
+    else {Loop (X-1)} end
+end
+{Loop 1000}
+end
+skip Browse Out
+end

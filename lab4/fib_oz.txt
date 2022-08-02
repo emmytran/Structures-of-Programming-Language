@@ -1,0 +1,103 @@
+// Haskell version of fib:
+//    fib :: Int -> Int
+//    fib 0 = 1
+//    fib 1 = 1
+//    fib x = fib (x-1) + fib (x-2)
+//
+// Rewrite fib in Oz kernel syntax using the template below, including
+// a "skip stack" command added to the first base case, using the 
+// primitive operations {Eq X Y B}, {IntMinus X Y A}, and {IntPlus X Y A}.
+// 
+// Run through the Oz interpreter by calling
+//    runFull "declarative" "fib_oz.txt" "fib_oz.out"
+// after ghci fib_oz.txt and give a brief explanation of each of the stack outputs.
+
+local Fib Zero One Two X Result in
+  Zero = 0    // var for base case
+  One = 1    // var for base case and IntMinus call
+  Two = 2    
+  Fib = proc {$ In Out} //begin Fib definition
+    local B1 B2 in    // declare vars for base case check
+      {Eq In Zero B1}   // is input zero? B1 is a bool
+      {Eq In One B2}   // is input one? B2 is a bool
+      if B1 then    // check condition
+      	Out = 1    // base case 1
+      else 
+        if B2 then   // check another condition
+          Out = 1    // base case 2
+          skip Stack  
+        else    // previous two conditions are not satisfied 
+          local A1 A2 Out1 Out2 in    // declaire vars for recursive call   
+            {IntMinus In One A1}    // subtract One from input A1 = In - 1
+            {IntMinus In Two A2}    // subtract Two from input A2 = In - 2
+            {Fib A1 Out1}   
+            {Fib A2 Out2}
+            {IntPlus Out1 Out2 Out}  // add two fib functions
+          end
+        end
+      end
+    end
+  end
+  X = 4
+  {Fib X Result}
+  skip Browse Result
+end
+
+/*
+------ fib_oz.txt ------
+*Hoz> runFull "declarative" "fib_oz.txt" "fib_oz.out"
+Stack : "local [\"EXU1\",\"EXU2\"] [EXU1 = A2,EXU2 = Out2,\"Fib\" \"EXU1\" \"EXU2\"]local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]local [\"EXU1\",\"EXU2\"] 
+[EXU1 = A2,EXU2 = Out2,\"Fib\" \"EXU1\" \"EXU2\"]local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]local [\"EXU1\",\"EXU2\"] 
+[EXU1 = A2,EXU2 = Out2,\"Fib\" \"EXU1\" \"EXU2\"]local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]skip/BResult"
+
+Stack : "local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]local [\"EXU1\",\"EXU2\"] 
+[EXU1 = A2,EXU2 = Out2,\"Fib\" \"EXU1\" \"EXU2\"]local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]skip/BResult"
+
+Stack : "local [\"EXU1\",\"EXU2\"] 
+[EXU1 = A2,EXU2 = Out2,\"Fib\" \"EXU1\" \"EXU2\"]local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]local [\"EXU1\",\"EXU2\",\"EXU3\"] 
+[EXU1 = Out1,EXU2 = Out2,EXU3 = Out,\"IntPlus\" \"EXU1\" \"EXU2\" \"EXU3\"]skip/BResult"
+
+Result : 5
+
+------- fib_oz.out ------
+[local ["Fib","Zero","One","Two","X","Result"] [Zero = 0,One = 1,Two = 2,Fib = proc {$ In Out} [local ["B1","B2"] [local 
+["EXU1","EXU2","EXU3"] [EXU1 = In,EXU2 = Zero,EXU3 = B1,"Eq" "EXU1" "EXU2" "EXU3"],
+local ["EXU1","EXU2","EXU3"] [EXU1 = In,EXU2 = One,EXU3 = B2,"Eq" "EXU1" "EXU2" "EXU3"],
+local ["EXU1"] [EXU1 = B1,if EXU1 then [Out = 1] else [local ["EXU1"] [EXU1 = B2,
+if EXU1 then [Out = 1,skip/st] 
+else [local ["A1","A2","Out1","Out2"] [local ["EXU1","EXU2","EXU3"] [EXU1 = In,EXU2 = One,EXU3 = A1,"IntMinus" "EXU1" "EXU2" "EXU3"],
+local ["EXU1","EXU2","EXU3"] [EXU1 = In,EXU2 = Two,EXU3 = A2,
+"IntMinus" "EXU1" "EXU2" "EXU3"],local ["EXU1","EXU2"] [EXU1 = A1,EXU2 = Out1,"Fib" "EXU1" "EXU2"],
+local ["EXU1","EXU2"] [EXU1 = A2,EXU2 = Out2,"Fib" "EXU1" "EXU2"],
+local ["EXU1","EXU2","EXU3"] [EXU1 = Out1,EXU2 = Out2,EXU3 = Out,
+"IntPlus" "EXU1" "EXU2" "EXU3"]]]]]]]],X = 4,
+local ["EXU1","EXU2"] [EXU1 = X,EXU2 = Result,"Fib" "EXU1" "EXU2"],skip/BResult]]
+
+------- Takeaways -------
+- For both files, when the base case is ran, the last thing that the program has to do which is to Browse the Result.
+This is the final step of the recursive algorithm in both cases. Hence, after the base case is reached, the program only
+have one statement remaining in the Stack
+
+- In the standard version, for the final else statement, the fib procedure calls itself twice and when one of the base cases
+is reached, it still has things to do in the stack because Fib has either been called once and will be called again, or Fib
+only needs to be called once more
+
+- Another thing that was noticed is that the iterative version only will reach one of the base cases once. The standard version
+reaches a base case, then it displays all of the statements that are left for the program to accomplish the first in the list
+being the next thing and the last is when the result is to be displayed
+
+- Moreover, the standard program will display the stack and a base case the exact amount of times as the result. The stack size 
+grows with the size of the value that Fib is called with. 
+
+- To simplify, there are more stacks in the recursive form than in the iterative form
+- In recursive form of Fibonacci, the Oz code calls itself to repeat the code,
+which causes the stacks to build up when we run the code
+- But in the iterative form, the stack in the iterative form of Fibonacci does not buld up because the iterative form loops
+only once to repeat part of the code. Hence, there is only one stack in the iterative form for Fibonacci as a result
+*/

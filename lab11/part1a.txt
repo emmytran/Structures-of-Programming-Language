@@ -1,0 +1,15 @@
+local B in             
+  thread               
+    B = true           
+  end
+  thread               
+    if B then          
+      thread           
+        skip Browse B  
+      end
+    end
+  end   
+  thread               
+    B = false          
+  end
+end

@@ -1,0 +1,179 @@
+//1.a.1 Display function
+local Display Generate X N in
+    fun {Generate N}            //an 'infinite' generator function
+        fun {$}
+            (N#{Generate (N+1)}) //first value and rest of stream
+        end
+    end
+    Display = proc {$ X N} //displays a list
+        local DisplayHelp Out Result in
+            DisplayHelp = proc {$ X N Out} //produces a list
+                local
+                    (H#F) = {X} //break up the stream
+                in
+                    if ((N-1)==0) then //when we reach the end
+                        Out = [H] //return the head of the stream
+                    else T in //otherwise
+                        {DisplayHelp F (N-1) T} //get the rest with recursion
+                        Out = (H|T) //output the list
+                    end
+                end
+            end
+            {DisplayHelp X N Result} //call helper to get list
+            skip Browse Result //display the list
+        end
+    end
+    X = {Generate 4} //generate a stream starting from 4
+    {Display X 5} //outputs [4 5 6 7 8]
+
+end
+
+//1.a.2
+local Generate Times Y Display X Result in
+    fun {Generate N} //generate a stream
+        fun {$}
+            (N#{Generate (N+1)})
+        end
+    end
+    fun {Times X N} //returns a list of (X*N)s
+        fun {$} //where X is a stream
+            (H#F) = {X} //break up stream
+        in
+            ((H*N)#{Times F N}) //head is the product, tail is recursive call
+        end
+    end
+    Display = proc {$ X N} //displays a list
+        local DisplayHelp Out Result in
+            DisplayHelp = proc {$ X N Out} //produces a list
+                local
+                    (H#F) = {X} //break up the stream
+                in
+                    if ((N-1)==0) then //when we reach the end
+                        Out = [H] //return the head of the stream
+                    else T in //otherwise
+                        {DisplayHelp F (N-1) T} //get the rest with recursion
+                        Out = (H|T) //output the list
+                    end
+                end
+            end
+            {DisplayHelp X N Result} //call helper to get list
+            skip Browse Result //display the list
+        end
+    end
+    X = {Generate 0} //get X
+    Y = {Times X 3} //get Y
+    {Display Y 5} //display it, outputs [0 3 6 9 12]
+end
+
+//1.a.3
+local Merge X Y Display Generate3 Generate5 in
+    fun {Generate3 N} //generate a stream
+        fun {$}
+            ((N*3)#{Generate3 (N+1)}) //of (N*3)'s
+        end
+    end
+    fun {Generate5 N} //generate a stream
+        fun {$}
+            ((N*5)#{Generate5 (N+1)}) //of (N*5)'s
+        end
+    end
+    
+    fun {Merge X Y} //merges two generated streams
+        fun {$}
+            (Hx#Fx) = {X} //break apart X
+            (Hy#Fy) = {Y} //break apart Y
+        in
+            if (Hx<Hy) then //if head of X is less then
+                (Hx#{Merge Y Fx}) //add it to list, rec. call with Y and X's tail
+            else //otherwise
+                if (Hx==Hy) then //if the heads are equal then
+                    (Hy#{Merge Fx Fy}) //add one to list and rec. call with the tails
+                else //otherwise
+                    (Hy#{Merge X Fy}) //add X's head to list, rec. call with X and Y's tail
+                end //..recursive call with X and Y's tail
+            end
+        end
+    end
+    Display = proc {$ X N} //displays a list
+        local DisplayHelp Out Result in
+            DisplayHelp = proc {$ X N Out} //produces a list
+                local
+                    (H#F) = {X} //break up the stream
+                in
+                    if ((N-1)==0) then //when we reach the end
+                        Out = [H] //return the head of the stream
+                    else T in //otherwise
+                        {DisplayHelp F (N-1) T} //get the rest with recursion
+                        Out = (H|T) //output the list
+                    end
+                end 
+            end
+            {DisplayHelp X N Result} //call helper to get list
+            skip Browse Result //display the list
+        end
+    end
+    X = {Generate3 1} //stream contents: [3 6 9 12 15 18 21 ...]
+    Y = {Generate5 1} //stream contents: [5 10 15 20 ...]
+    {Display {Merge X Y} 8} //output: [3 5 6 9 10 12 15 18]
+end
+
+//1.a.4
+local E Generate Ham Times Merge Display Result in
+    fun {Generate N} //generate a stream
+        fun {$}
+            (N#{Generate (N+1)})
+        end
+    end
+    fun {Merge X Y} //merges two generated streams
+        fun {$}
+            (Hx#Fx) = {X} //break apart X
+            (Hy#Fy) = {Y} //break apart Y
+        in
+            if (Hx<Hy) then //if head of X is less then
+                (Hx#{Merge Y Fx}) //add it to list, rec. call with Y and X's tail
+            else //otherwise
+                if (Hx==Hy) then //if the heads are equal then
+                    (Hy#{Merge Fx Fy}) //add one to list and rec. call with the tails
+                else //otherwise
+                    (Hy#{Merge X Fy}) //add X's head to list, rec. call with X and Y's tail
+                end //..recursive call with X and Y's tail
+            end
+        end
+    end
+    Display = proc {$ X N} //displays a list
+        local DisplayHelp Out Result in
+            DisplayHelp = proc {$ X N Out} //produces a list
+                local
+                    (H#F) = {X} //break up the stream
+                in
+                    if 
+                        ((N-1)==0) then //when we reach the end
+                        Out = [H] //return the head of the stream
+                    else T in //otherwise
+                        {DisplayHelp F (N-1) T} //get the rest with recursion
+                        Out = (H|T) //output the list
+                    end
+                end
+            end
+            {DisplayHelp X N Result} //call helper to get list
+            skip Browse Result //display the list
+        end
+    end
+    fun {Times X N} //returns a list of (X*N)s
+        fun {$} //where X is a stream
+            (H#F) = {X} //break up stream
+        in
+            ((H*N)#{Times F N}) //head is the product, tail is recursive call
+        end
+    end
+    fun {Ham X}
+        fun {$}
+            (H#F) = {X} //break up stream
+        in //below is list with merged stream for a tail using recursion
+            (H#{Merge {Times {Ham X} 2} {Merge {Times {Ham X} 3} {Times {Ham X} 5}}})
+        end
+    end
+    E = {Generate 1} //a stream starting with 1
+    Result = {Ham E} //start the Hamming function with 1
+    {Display Result 10} //display first 10 values (below)
+end

@@ -1,0 +1,62 @@
+// 3) "in" declaration 
+local D1 in 
+    local Three in
+        Three = 3
+        D1 = tree(1:Three 2:D1)
+    end
+    local X in
+        local Y in
+            local A in
+                local B in
+                    local Tree in
+                        Tree = tree(1:A 2:B)
+                        Tree = D1
+                    end
+                end
+            end
+        end
+    end
+local Check in
+    local One in
+        local Onee in
+            One = 1
+            Onee = 1
+            {Eq One Onee Check}
+        end
+    end
+    if Check then
+        local B in
+            local Five in
+                local Two in
+                    Five = 5
+                    Two = 2
+                    {IntMinus Five Two B}
+                end
+            end
+            local Z in
+                skip Browse B
+            end
+        end
+    else
+        skip Basic
+        end
+    end
+end
+// 5) Bind fun
+local A B in
+ skip Basic
+ local Five Three Four E1 in
+ Five = 5
+ Three = 3
+ Four = 4
+ local P in
+ P = '#'(1:B 2:B)
+ A = rdc(1:Four 2:B 3:P)
+ {IntMinus Three Four E1}
+ {IntMinus Five E1 B}
+ skip Browse A
+ skip Browse B
+ skip Store
+ end
+ end
+end

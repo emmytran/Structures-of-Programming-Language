@@ -1,0 +1,32 @@
+// 5) Bind fun
+local A in
+    local B in  
+        skip Basic 
+        local List in
+            local Four in
+                Four = 4
+                local Pair in
+                    Pair = '#'(1:B 2:B)
+                    List = rdc(1:Four 2:B 3:Pair)
+                end
+            end
+        A = List
+        end
+        local Five in
+            Five = 5
+            local Sub in
+                local Three in
+                    local Four in
+                        Three = 3
+                        Four = 4
+                        {IntMinus Three Four Sub}
+                    end
+                end
+            {IntPlus Five Sub B}
+            end
+        end
+        skip Browse A 
+        skip Browse B
+        skip Store
+    end
+end

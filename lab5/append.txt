@@ -1,0 +1,30 @@
+local Append L1 L2 Out Reverse Out1 in 
+
+   // Append function on p 133 (modified for hoz)
+   fun {Append Ls Ms}
+      case Ls 
+      of nil then Ms
+      [] '|'(1:X 2:Lr) then (X|{Append Lr Ms})
+      end
+   end
+
+   L1 = (1|(2|(3|nil)))
+   L2 = (4|(5|(6|nil)))
+
+   Out = {Append L1 L2}
+   skip Browse Out
+   skip Full
+
+   // O(n^2) Reverse function on p 135 (modified for hoz):
+   fun {Reverse Xs}
+      case Xs
+      of nil then nil
+      [] '|'(1:X 2:Xr) then
+         {Append {Reverse Xr} [X]}
+      end
+   end
+
+   Out1 = {Reverse L1}
+   skip Browse Out1
+   skip Full
+end

@@ -1,0 +1,103 @@
+// Run this program through the Oz interpreter by calling
+//    runFull "declarative" "Sem2.txt" "Sem2.out"
+// Explain the resulting store
+
+local Max Y in
+  Max = proc {$ X}
+    local B in 
+        {GT X Y B}
+        if B then
+          skip Browse X
+        else
+          skip Browse Y
+        end
+    end
+  end
+  Y = 3
+  local X Y in 
+    Y = 6
+    X = 4
+    skip Full
+    {Max X}
+  end
+end
+
+/* 
+--------- Sem2.out ---------
+[local ["Max","Y"] [Max = proc {$ X} [local ["B"] [local ["EXU1","EXU2","EXU3"] [EXU1 = X,EXU2 = Y,EXU3 = B,
+"GT" "EXU1" "EXU2" "EXU3"],local ["EXU1"] [EXU1 = B,if EXU1 then [skip/BX] else [skip/BY]]]],Y = 3,
+local ["X","Y"] [Y = 6,X = 4,skip/f,local ["EXU1"] [EXU1 = X,"Max" "EXU1"]]]]
+
+--------- Sem2.txt ----------
+*Hoz> runFull "declarative" "Sem2.txt" "Sem2.out"
++Store : ((15, 12), 2), 
+((14, 13, 11, 10, 8), 1), 
+((9), pair(1:10 2:11)), 
+((1), Primitive Operation), 
+((2), Primitive Operation), 
+((3), Primitive Operation), 
+((4), Primitive Operation), 
+((5), Primitive Operation), 
+((6), Primitive Operation), 
+((7), Primitive Operation)
+
+Mutable Store: Empty
+Current Environment : ("S" -> 12, "Z" -> 10, "W" -> 11, "Y" -> 9, "X" -> 8, "IntPlus" -> 1, "IntMinus" -> 2,
+ "Eq" -> 3, "GT" -> 4, "LT" -> 5, "Mod" -> 6, "IntMultiply" -> 7)
+Stack : ""
+
+Store : ((10), 4), 
+((11), 6), 
+((8), proc(["X"],[local ["B"] [local ["EXU1","EXU2","EXU3"] [EXU1 = X,EXU2 = Y,EXU3 = B,
+"GT" "EXU1" "EXU2" "EXU3"],local ["EXU1"] [EXU1 = B,if EXU1 then [skip/BX] else [skip/BY]]]],[("Y",9),("GT",4)])), 
+((9), 3), 
+((1), Primitive Operation), 
+((2), Primitive Operation), 
+((3), Primitive Operation), 
+((4), Primitive Operation), 
+((5), Primitive Operation), 
+((6), Primitive Operation), 
+((7), Primitive Operation)
+
+Mutable Store: Empty
+Current Environment : ("X" -> 10, "Y" -> 11, "Max" -> 8, "Y" -> 9, "IntPlus" -> 1, 
+"IntMinus" -> 2, "Eq" -> 3, "GT" -> 4, "LT" -> 5, "Mod" -> 6, "IntMultiply" -> 7)
+Stack : "local [\"EXU1\"] [EXU1 = X,\"Max\" \"EXU1\"]"
+
+X : 4
+
+--------- Takeaways -------
+- For the Environment, program set up primitive operations & add them to environment
+- Environment: ( "IntPlus" -> 1, "IntMinus" -> 2, "Eq" -> 3, "GT" -> 4, "LT" -> 5, "Mod" -> 6,
+"IntMultiply" -> 7 )
+
+- "local Max Y in..." created two variables Max and Y & put them in the environment
+- Environment: ("Max" -> 8, "Y" -> 9, "IntPlus" -> 1, "IntMinus" -> 2, "Eq" -> 3, "GT" -> 4, 
+"LT" -> 5, "Mod" -> 6, "IntMultiply" -> 7)
+
+- "local X Y in ..." created two variables X and Y & put them in environment
+- There are two "Y"s, but in different layers
+- Environment : ("X" -> 10, "Y" -> 11, "Max" -> 8, "Y" -> 9, "IntPlus" -> 1, "IntMinus" -> 2,
+"Eq" -> 3, "GT" -> 4, "LT" -> 5, "Mod" -> 6, "IntMultiply" -> 7)
+
+- Max was called in the beginning, which takes an argument, then compares the argument with 
+a local variable X inside. If X > Y -> displays X, otherwise displays Y.
+
+- After "local Max Y in ...." executed, there are two variables added to Environment,
+which are procedure Max and argument Y
+"Max" -> ((8), proc) "Y" -> ((9),unbound)
+
+- Once "Y = 3" is executed, the program bound Y to value 3
+"Y" -> ((9),3)
+
+- Once " local X Y in...." executed, X and another Y (inner layer) are added
+"X" -> ((10),unbound), "Y" -> ((11),unbound)
+
+- One "Y = 6" and "X = 4" are executed, Y is bound to 6 and X to 4
+"X" -> ((10),4) "Y" -> ((11),6)
+
+- Once Full is skipped, procedure Max (4) executed.
+- Y is then bound to 3 (outer layer)
+- Inside Max, it compared 4 and 3, then assigned to B.
+- Since X > Y (4 > 3), so X : 4 is displayed
+*/
